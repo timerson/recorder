@@ -3,39 +3,78 @@
 
   Turns on and off two relays based on the changing state of a switch (or multiple switches)
   These relays activate the recording and pause feature remotely with a foot activated switch(s)
-  The recording relay AKA relay1 uses a 1K ohm resistor to activate recording and the rec/pause
-  relay AKA relay2 uses 22K ohm resistor to pause the recording 
+  The recording relay AKA Relay4 uses a 1K ohm resistor to activate recording and the rec/pause
+  relay AKA Relay3 uses 22K ohm resistor to pause the recording 
 
+  Tip of plug               Sleeve of plug
+  ^                         ^
+  |                         |                
+  |                         |
+  |                /        |
+  |     22Kohm    /         |
+  +----/\/\/\----/    ------+
+  |               ###       |
+  |      D6*<-----###       |
+  |               ###       |
+  |     gnd*<-----###       |
+  |               ###       |
+  |             Relay 3     |
+  |                         |
+  |                         |
+  |                /        |
+  |     1Kohm     /         |
+  +----/\/\/\----/    ------+
+                  ###
+         D7*<-----###  
+                  ###  
+        gnd*<-----###
+                  ###  
+                Relay 4
+
+               /
+              /
+gnd*<--------/    ------> D2*
+
+*pin of arduino
+
+                               
   The circuit:
-  - Relays are attached to D4 and D5
-  - Relay1 common attached to 1 Kohm resistor
-  - Relay2 common attached to 22 Kohm resistor
-  - Relay1 NO attached to Relay2 NO to Sleeve of plug
+  - Relays are attached to D6 and D7
+  - Relay4 common attached to 1 Kohm resistor
+  - Relay3 common attached to 22 Kohm resistor
+  - Relay4 NO attached to Relay3 NO to Sleeve of plug
   - 1Kohm and 22Kohm attached to Tip of plug 
   - pushbutton attached to pin 2 and ground
+
+  Components
+  - Arduino uno  https://www.arduino.cc/en/Main/arduinoBoardUno&gt;
+  - Relay shield https://wiki.seeedstudio.com/Relay_Shield_v3/
+  - 22Kohm resistor
+  - 1Kohm resistor
 
   created 2021
   by Tim Peterson
 */
 
-// constants won't change. They're used here to set pin numbers:
+// constants
 const int buttonPin = 2;     // the number of the pushbutton pin
-const int Relay2 = 6;     
-const int Relay1 = 7;
+const int Relay3 = 6;     
+const int Relay4 = 7;
 const int onTime = 50;
 
-// variables will change:
+// variables
 int change = 0;
-int previousButtonState = 0;
-int currentButtonState = 0;         // variable for reading the pushbutton status
-int timer = onTime;
-bool relayActive = false;
+int previousButtonState = 0;  // previous pushbutton status
+int currentButtonState = 0;   // variable for reading the pushbutton status
+int timer = onTime;           // timer for activating the rlays
+bool relayActive = false;     // relay activation status
+
 void setup() {
   // initialize the LED pin as an output:
-  pinMode(Relay1, OUTPUT);
-  pinMode(Relay2, OUTPUT);   
-  digitalWrite(Relay1, LOW);
-  digitalWrite(Relay2, LOW);
+  pinMode(Relay4, OUTPUT);
+  pinMode(Relay3, OUTPUT);   
+  digitalWrite(Relay4, LOW);
+  digitalWrite(Relay3, LOW);
   
   // initialize the pushbutton pin as an input:
   pinMode(buttonPin, INPUT_PULLUP);
@@ -54,13 +93,13 @@ void loop() {
     if (currentButtonState ^ previousButtonState) {
       timer = 0;
       if (currentButtonState == HIGH) {
-        // turn Relay1 on
-        digitalWrite(Relay1, HIGH);
+        // turn Relay4 on
+        digitalWrite(Relay4, HIGH);
         relayActive = true;
       }
       else {
-        // turn   Relay2 on
-        digitalWrite(Relay2, HIGH);
+        // turn   Relay3 on
+        digitalWrite(Relay3, HIGH);
         relayActive = true;  
       }
     }
@@ -70,9 +109,9 @@ void loop() {
     timer++; 
   }
   else {
-    // turn Relay1 and Relay2 off:
-    digitalWrite(Relay1, LOW);
-    digitalWrite(Relay2, LOW);
+    // turn Relay4 and Relay3 off:
+    digitalWrite(Relay4, LOW);
+    digitalWrite(Relay3, LOW);
     relayActive = false;
   }
 }
